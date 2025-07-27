@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+	"sync/atomic"
 	"time"
 )
 
 func main() {
 	name := "Go Developers"
 	fmt.Println("Azure for", name)
-	time.Sleep(500)
 	listing1()
-
+	//listing2()
 	// i := 0
 	// go func() {
 	// 	i++
@@ -37,17 +37,34 @@ func main() {
 // }
 
 func listing1() {
-
 	fmt.Println("*")
 	i := 0
+
+	go func() {
+		i++
+		fmt.Println("**")
+	}()
 
 	go func() {
 		i++
 		fmt.Println("***")
 	}()
 
+	time.Sleep(100)
+	fmt.Println(i) // 0, 1, 2
+}
+
+func listing2() {
+	var i int64
+
 	go func() {
-		i++
-		fmt.Println("*****")
+		atomic.AddInt64(&i, 1)
 	}()
+
+	go func() {
+		atomic.AddInt64(&i, 1)
+	}()
+
+	//time.Sleep(100)
+	fmt.Println("atomic", i) // 0, 1, 2
 }
