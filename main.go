@@ -9,7 +9,13 @@ import (
 func main() {
 	name := "Go Developers"
 	fmt.Println("Azure for", name)
-	listing1()
+	//listing1()
+
+	// read 10 fibonacci numbers from channel returned by `fib` function
+	for fn := range fib(10) {
+		fmt.Println("Current fibonacci number is", fn)
+	}
+
 	//listing2()
 	// i := 0
 	// go func() {
