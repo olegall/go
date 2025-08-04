@@ -24,18 +24,14 @@ func main_habr() {
 	chanOptSqr2 := getSquareChan(chanInputNums)
 
 	// step 3: fan-in (combine) `chanOptSqr1` and `chanOptSqr2` output to merged channel
-	// this is achieved by calling `merge` function which takes multiple channels as arguments
-	// and using `WaitGroup` and multiple goroutines to receive square number, we can send square numbers
-	// to `merged` channel and close it
+	// this is achieved by calling `merge` function which takes multiple channels as arguments and using `WaitGroup` and multiple goroutines to receive square number, we can send square numbers to `merged` channel and close it
 	chanMergedSqr := merge(chanOptSqr1, chanOptSqr2)
+	//chanMergedSqr := merge(chanOptSqr1) // рез-т тот же: 285
 
-	// step 4: let's sum all the squares from 0 to 9 which should be about `285`
-	// this is done by using `for range` loop on `chanMergedSqr`
+	// step 4: let's sum all the squares from 0 to 9 which should be about `285`. this is done by using `for range` loop on `chanMergedSqr`
 	sqrSum := 0
 
-	// run until `chanMergedSqr` or merged channel closes
-	// that happens in `merge` function when all goroutines pushing to merged channel finishes
-	// check line no. 86 and 87
+	// run until `chanMergedSqr` or merged channel closes. that happens in `merge` function when all goroutines pushing to merged channel finishes. check line no. 86 and 87
 	for num := range chanMergedSqr {
 		sqrSum += num
 	}
@@ -102,34 +98,25 @@ func getSquareChan(input <-chan int) <-chan int {
 	return output
 }
 
-// returns a merged channel of `outputsChan` channels
-// this produce fan-in channel
-// this is variadic function
+// returns a merged channel of `outputsChan` channels. this produce fan-in channel. this is variadic function
 func merge(outputsChan ...<-chan int) <-chan int {
-	// create a WaitGroup
-	var wg sync.WaitGroup
+	var wg sync.WaitGroup // create a WaitGroup
 
-	// make return channel
-	merged := make(chan int, 100)
+	merged := make(chan int, 100) // make return channel
 
-	// increase counter to number of channels `len(outputsChan)`
-	// as we will spawn number of goroutines equal to number of channels received to merge
-	wg.Add(len(outputsChan))
+	wg.Add(len(outputsChan)) // increase counter to number of channels `len(outputsChan)` as we will spawn number of goroutines equal to number of channels received to merge
 
-	// function that accept a channel (which sends square numbers)
-	// to push numbers to merged channel
+	// function that accept a channel (which sends square numbers) to push numbers to merged channel
 	output := func(sc <-chan int) {
 		// run until channel (square numbers sender) closes
 		for sqr := range sc {
 			merged <- sqr
 		}
-		// once channel (square numbers sender) closes,
-		// call `Done` on `WaitGroup` to decrement counter
+		// once channel (square numbers sender) closes, call `Done` on `WaitGroup` to decrement counter
 		wg.Done()
 	}
 
-	// run above `output` function as groutines, `n` number of times
-	// where n is equal to number of channels received as argument the function
+	// run above `output` function as groutines, `n` number of times where n is equal to number of channels received as argument the function
 	// here we are using `for range` loop on `outputsChan` hence no need to manually tell `n`
 	for _, optChan := range outputsChan {
 		go output(optChan)
