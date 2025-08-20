@@ -25,6 +25,27 @@ func main() {
 	// }()
 
 	main_habr()
+
+	fmt.Println("*** 9.3 ***")
+	//s := []int{1, 2, 3}
+	/*for _, i := range s { // Итерации по каждому элементу
+		go func() {
+			fmt.Print(i) // Обращение к переменной цикла
+		}()
+	}*/
+	/*for _, i := range s {
+		val := i // Создание переменной, локальной для каждой итерации
+		go func() {
+			fmt.Print(val)
+		}()
+	}*/
+	/*for _, i := range s {
+		go func(val int) {
+			fmt.Print(val)
+		}(i) // Вызов этой функции с текущим значением переменной i
+	}*/
+
+	time.Sleep(1000)
 }
 
 // func main() {
