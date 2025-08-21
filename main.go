@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -46,7 +45,7 @@ func main() {
 		}(i) // Вызов этой функции с текущим значением переменной i
 	}*/
 
-	fmt.Println("*** 9.9 ***")
+	//fmt.Println("*** 9.9 ***")
 	// s := make([]int, 1)
 	// go func() { // Добавление к s нового элемента в новой горутине
 	// 	s1 := append(s, 1)
@@ -81,7 +80,7 @@ func main() {
 	// 	fmt.Println(s2)
 	// }()
 
-	//fmt.Println("*** 9.11 ***")
+	fmt.Println("*** 9.11 ***")
 	// wg := sync.WaitGroup{}
 	// var v uint64
 	// for i := 0; i < 3; i++ {
@@ -106,17 +105,143 @@ func main() {
 	// wg.Wait()
 	// fmt.Println(v)
 
-	wg := sync.WaitGroup{}
-	var v uint64
-	for i := 0; i < 3; i++ {
-		wg.Add(1)   // Увеличивается значение счетчика группы ожидания
-		go func() { // Создается горутина
-			atomic.AddUint64(&v, 1) // Атомарно увеличивается значение переменной v
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	fmt.Println(v)
+	// wg := sync.WaitGroup{}
+	// var v uint64
+	// for i := 0; i < 3; i++ {
+	// 	wg.Add(1)   // Увеличивается значение счетчика группы ожидания
+	// 	go func() { // Создается горутина
+	// 		atomic.AddUint64(&v, 1) // Атомарно увеличивается значение переменной v
+	// 		wg.Done()
+	// 	}()
+	// }
+	// wg.Wait()
+	// fmt.Println(v)
+
+	// fmt.Println("*** 9.12 ***")
+	// type Donation struct {
+	// 	mu      sync.RWMutex
+	// 	balance int
+	// }
+	// donation := &Donation{}
+	// // горутины-слушатели
+	// f := func(goal int) { //Создание замыкания
+	// 	donation.mu.RLock()
+	// 	for donation.balance < goal { // Проверка достижения цели
+	// 		donation.mu.RUnlock()
+	// 		donation.mu.RLock()
+	// 	}
+	// 	fmt.Printf("$%d goal reached\n", donation.balance)
+	// 	donation.mu.RUnlock()
+	// }
+	// go f(10)
+	// go f(15)
+	// // горутина обновления
+	// go func() {
+	// 	for { // Продолжение увеличения баланса
+	// 		time.Sleep(time.Second)
+	// 		donation.mu.Lock()
+	// 		donation.balance++
+	// 		donation.mu.Unlock()
+	// 	}
+	// }()
+
+	// type Donation struct { // пример выводит в консоль
+	// 	balance int
+	// 	ch      chan int // Обновление Donation таким образом, что он содержит каналы
+	// }
+	// donation := &Donation{ch: make(chan int)}
+	// // горутины-слушатели
+	// f := func(goal int) {
+	// 	for balance := range donation.ch { //Получение обновлений каналов
+	// 		if balance >= goal {
+	// 			fmt.Printf("$%d goal reached\n", balance)
+	// 			return
+	// 		}
+	// 	}
+	// }
+	// go f(10)
+	// go f(15)
+	// // горутина обновления
+	// for {
+	// 	time.Sleep(time.Second)
+	// 	donation.balance++
+	// 	donation.ch <- donation.balance
+	// }
+
+	// type Donation struct {
+	// 	cond *sync.Cond // Добавление *sync.Cond
+	// 	balance int
+	// }
+	// donation := &Donation {
+	// 	cond: sync.NewCond(&sync.Mutex{}), // sync.Cond  использует мьютекс
+	// }
+	// // горутины-слушатели
+	// f := func(goal int) {
+	// 	donation.cond.L.Lock()
+	// 	for donation.balance < goal {
+	// 		donation.cond.Wait()
+	// 	}
+	// 		fmt.Printf("%d$ goal reached\n", donation.balance)
+	// 		donation.cond.L.Unlock()
+	// }
+	// go f(10)
+	// go f(15)
+	// // горутина обновления
+	// for {
+	// 	time.Sleep(time.Second)
+	// 	donation.cond.L.Lock()
+	// 	donation.balance++ // Увеличение баланса в рамках блокировки/разблокировки
+	// 	donation.cond.L.Unlock()
+	// 	donation.cond.Broadcast() // Трансляция факта выполнения условия (баланс обновлен)
+	// }
+
+	// fmt.Println("*** 9.14 ***")
+	// type Counter struct {
+	// 	mu sync.Mutex
+	// 	counters map[string]int
+	// }
+	// func NewCounter() Counter { // Фабричная функция
+	// 	return Counter{counters: map[string]int{}}
+	// }
+	// func (c Counter) Increment(name string) {
+	// 	c.mu.Lock() // Увеличение значения счетчика в критической секции
+	// 	defer c.mu.Unlock()
+	// 	c.counters[name]++
+	// }
+
+	// type Counter struct {
+	// 	mu sync.Mutex
+	// 	counters map[string]int
+	// }
+	// func NewCounter() Counter { // Фабричная функция
+	// 	return Counter{counters: map[string]int{}}
+	// }
+	// func (c *Counter) Increment(name string) {
+	// 	c.mu.Lock() // Увеличение значения счетчика в критической секции
+	// 	defer c.mu.Unlock()
+	// 	c.counters[name]++
+	// }
+
+	// type Counter struct {
+	// 	mu *sync.Mutex
+	// 	counters map[string]int
+	// }
+	// func NewCounter() Counter { // Фабричная функция
+	// 	return Counter{counters: map[string]int{}}
+	// }
+	// func (c Counter) Increment(name string) {
+	// 	c.mu.Lock() // Увеличение значения счетчика в критической секции
+	// 	defer c.mu.Unlock()
+	// 	c.counters[name]++
+	// }
+
+	// counter := NewCounter()
+	// go func() {
+	// 	counter.Increment("foo")
+	// }()
+	// go func() {
+	// 	counter.Increment("bar")
+	// }()
 
 	time.Sleep(1000)
 }
