@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -44,6 +45,78 @@ func main() {
 			fmt.Print(val)
 		}(i) // Вызов этой функции с текущим значением переменной i
 	}*/
+
+	fmt.Println("*** 9.9 ***")
+	// s := make([]int, 1)
+	// go func() { // Добавление к s нового элемента в новой горутине
+	// 	s1 := append(s, 1)
+	// 	fmt.Println(s1)
+	// }()
+	// go func() { // То же самое
+	// 	s2 := append(s, 1)
+	// 	fmt.Println(s2)
+	// }()
+
+	// s := make([]int, 0, 1)
+	// go func() { // Добавление к s нового элемента в новой горутине
+	// 	s1 := append(s, 1)
+	// 	fmt.Println(s1)
+	// }()
+	// go func() { // То же самое
+	// 	s2 := append(s, 1)
+	// 	fmt.Println(s2)
+	// }()
+
+	// s := make([]int, 0, 1)
+	// go func() {
+	// 	sCopy := make([]int, len(s), cap(s))
+	// 	copy(sCopy, s) // Создание копии для использования append на копии среза
+	// 	s1 := append(sCopy, 1)
+	// 	fmt.Println(s1)
+	// }()
+	// go func() {
+	// 	sCopy := make([]int, len(s), cap(s))
+	// 	copy(sCopy, s) // То же самое
+	// 	s2 := append(sCopy, 1)
+	// 	fmt.Println(s2)
+	// }()
+
+	//fmt.Println("*** 9.11 ***")
+	// wg := sync.WaitGroup{}
+	// var v uint64
+	// for i := 0; i < 3; i++ {
+	// 	go func() { // Создается горутина
+	// 		wg.Add(1)               // Увеличивается значение счетчика группы ожидания
+	// 		atomic.AddUint64(&v, 1) // Атомарно увеличивается значение переменной v
+	// 		wg.Done()
+	// 	}()
+	// }
+	// wg.Wait()
+	// fmt.Println(v)
+
+	// wg := sync.WaitGroup{}
+	// var v uint64
+	// wg.Add(1) // Увеличивается значение счетчика группы ожидания
+	// for i := 0; i < 3; i++ {
+	// 	go func() { // Создается горутина
+	// 		atomic.AddUint64(&v, 1) // Атомарно увеличивается значение переменной v
+	// 		wg.Done()
+	// 	}()
+	// }
+	// wg.Wait()
+	// fmt.Println(v)
+
+	wg := sync.WaitGroup{}
+	var v uint64
+	for i := 0; i < 3; i++ {
+		wg.Add(1)   // Увеличивается значение счетчика группы ожидания
+		go func() { // Создается горутина
+			atomic.AddUint64(&v, 1) // Атомарно увеличивается значение переменной v
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	fmt.Println(v)
 
 	time.Sleep(1000)
 }
