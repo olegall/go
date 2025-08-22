@@ -2,31 +2,105 @@ package main
 
 import (
 	"fmt"
-	"sync/atomic"
 	"time"
 )
+
+func sequentialMergesort(s []int) {
+	if len(s) <= 1 {
+		return
+	}
+	middle := len(s) / 2
+	sequentialMergesort(s[:middle]) // Первая половина
+	sequentialMergesort(s[middle:]) // Вторая половина
+	merge(s, middle)                // Объединение двух половин
+}
+
+func merge(s []int, middle int) {
+	helper := make([]int, len(s))
+	copy(helper, s)
+
+	helperLeft := 0
+	helperRight := middle
+	current := 0
+	high := len(s) - 1
+
+	for helperLeft <= middle-1 && helperRight <= high {
+		if helper[helperLeft] <= helper[helperRight] {
+			s[current] = helper[helperLeft]
+			helperLeft++
+		} else {
+			s[current] = helper[helperRight]
+			helperRight++
+		}
+		current++
+	}
+
+	for helperLeft <= middle-1 {
+		s[current] = helper[helperLeft]
+		current++
+		helperLeft++
+	}
+}
 
 func main() {
 	name := "Go Developers"
 	fmt.Println("Azure for", name)
-	//listing1()
 
 	// read 10 fibonacci numbers from channel returned by `fib` function
 
-	//listing2()
+	//main_habr()
+	fmt.Println("*** 8.2.2 ***")
+
+	fmt.Println("*** 8.4 ***")
+	i := 0 // TODO обернуть в ф-ю, вызвать
+	go func() {
+		i++ //Увеличение значения i
+	}()
+	go func() {
+		i++
+	}()
+	time.Sleep(100)
+	fmt.Println(i)
+
+	// var i int64
+	// go func() {
+	// 	atomic.AddInt64(&i, 1) // Атомарное увеличение значения i
+	// }()
+	// go func() {
+	// 	atomic.AddInt64(&i, 1) // То же самое
+	// }()
+	// time.Sleep(100)
+	// fmt.Println(i)
+
 	// i := 0
+	// mutex := sync.Mutex{}
 	// go func() {
-	// 	i++
-	// 	fmt.Println("***")
+	// 	mutex.Lock()   // Начало критического раздела
+	// 	i++            // Увеличение значения i на единицу
+	// 	mutex.Unlock() // Конец критического раздела
 	// }()
 	// go func() {
+	// 	mutex.Lock()
 	// 	i++
-	// 	fmt.Println("*****")
+	// 	mutex.Unlock()
 	// }()
+	// time.Sleep(100)
+	// fmt.Println(i)
 
-	main_habr()
+	// i := 0
+	// ch := make(chan int)
+	// go func() {
+	// 	ch <- 1 // Уведомление горутины об увеличении на 1
+	// }()
+	// go func() {
+	// 	ch <- 1
+	// }()
+	// i += <-ch // Увеличение i от того ее значения, которое было получено из канала
+	// i += <-ch
+	// time.Sleep(100)
+	// fmt.Println(i)
 
-	fmt.Println("*** 9.3 ***")
+	//fmt.Println("*** 9.3 ***")
 	//s := []int{1, 2, 3}
 	/*for _, i := range s { // Итерации по каждому элементу
 		go func() {
@@ -44,6 +118,7 @@ func main() {
 			fmt.Print(val)
 		}(i) // Вызов этой функции с текущим значением переменной i
 	}*/
+	// time.Sleep(100)
 
 	//fmt.Println("*** 9.9 ***")
 	// s := make([]int, 1)
@@ -55,6 +130,7 @@ func main() {
 	// 	s2 := append(s, 1)
 	// 	fmt.Println(s2)
 	// }()
+	// time.Sleep(100)
 
 	// s := make([]int, 0, 1)
 	// go func() { // Добавление к s нового элемента в новой горутине
@@ -65,6 +141,7 @@ func main() {
 	// 	s2 := append(s, 1)
 	// 	fmt.Println(s2)
 	// }()
+	// time.Sleep(100)
 
 	// s := make([]int, 0, 1)
 	// go func() {
@@ -79,8 +156,9 @@ func main() {
 	// 	s2 := append(sCopy, 1)
 	// 	fmt.Println(s2)
 	// }()
+	// time.Sleep(100)
 
-	fmt.Println("*** 9.11 ***")
+	//fmt.Println("*** 9.11 ***")
 	// wg := sync.WaitGroup{}
 	// var v uint64
 	// for i := 0; i < 3; i++ {
@@ -91,6 +169,7 @@ func main() {
 	// 	}()
 	// }
 	// wg.Wait()
+	// time.Sleep(100)
 	// fmt.Println(v)
 
 	// wg := sync.WaitGroup{}
@@ -103,6 +182,7 @@ func main() {
 	// 	}()
 	// }
 	// wg.Wait()
+	// time.Sleep(100)
 	// fmt.Println(v)
 
 	// wg := sync.WaitGroup{}
@@ -115,6 +195,7 @@ func main() {
 	// 	}()
 	// }
 	// wg.Wait()
+	// time.Sleep(100)
 	// fmt.Println(v)
 
 	// fmt.Println("*** 9.12 ***")
@@ -242,8 +323,7 @@ func main() {
 	// go func() {
 	// 	counter.Increment("bar")
 	// }()
-
-	time.Sleep(1000)
+	// time.Sleep(100)
 }
 
 // func main() {
@@ -259,36 +339,3 @@ func main() {
 // 	fmt.Scanln() // ждем ввода пользователя
 // 	fmt.Println("The End")
 // }
-
-func listing1() {
-	fmt.Println("*")
-	i := 0
-
-	go func() {
-		i++
-		fmt.Println("**")
-	}()
-
-	go func() {
-		i++
-		fmt.Println("***")
-	}()
-
-	time.Sleep(100)
-	fmt.Println(i) // 0, 1, 2
-}
-
-func listing2() {
-	var i int64
-
-	go func() {
-		atomic.AddInt64(&i, 1)
-	}()
-
-	go func() {
-		atomic.AddInt64(&i, 1)
-	}()
-
-	//time.Sleep(100)
-	fmt.Println("atomic", i) // 0, 1, 2
-}
